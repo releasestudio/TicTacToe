@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: blanchedalmond;
+            
+        }
+        #text{
+            text-align: center;
+            font-size: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+        .gameBoard{
+            border: 2px solid blueviolet;
+            width: 70vh;
+            height: 70vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+        }
+        @media only screen and (max-width: 1000px) and (min-resolution: 300dpi),(orientation: Portrait){
+            .gameBoard{
+                width: 90vw;
+                height: 90vw;
+            }
+        }
+        .gameBoard div{
+            border: 2px solid blueviolet;
+            width: 100%;
+            background-position: center; /* Center the image */
+            background-size:cover; /* Resize the background image to cover the entire container */
+        }
+        button{
+            width: 300px;
+            margin-top: 30px;
+            padding: 10px 0;
+            background-color: transparent;
+            font-size: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            border-radius: 30px;
+        }
+        button:hover{
+            background-color: rgb(255, 208, 137);
+        }
+        button:active{
+            background-color: blueviolet;
+            color: rgb(255, 208, 137);
+        }
+    </style>
+    <script defer>
+        const winningCombo = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        let currentGame = [0,0,0,0,0,0,0,0,0];
+        let currentPlayer = "circle";
+        const circleImage = "url('https://cdn-icons-png.flaticon.com/512/481/481078.png')";
+        const crossImage = "url('https://cdn-icons-png.flaticon.com/512/1828/1828778.png')";
+
+            const checkWinner = () => {
+                //checking for a winner
+                let winnerExist = false;
+                //cellsPlayed is there to keep the count of how many cells have been played.
+                let cellsPlayed = [];
+                for (let index = 0; index < 9; index++) {
+                    if (currentGame[index] != 0) {
+                        cellsPlayed.push("played")
+                    }
+                };
+                //for each wining combination possible check all corresponding cells to see if they are owned by one player.
+                winningCombo.forEach(combi => {
+                    if (
+                        currentGame[combi[0]] === currentGame[combi[1]] &&
+                        currentGame[combi[1]] === currentGame[combi[2]] &&
+                        currentGame[combi[2]] != 0
+                    ) {
+                        //what to do in case of victory
+                        console.log('The winner is ' + currentGame[combi[0]]);
+                        document.getElementById("text").innerHTML = currentGame[combi[0]] + ' has won!';
+                        currentPlayer = 'win' + currentGame[combi[0]];
+                        winnerExist = true;
+
+                        //Fading all cells expet the wining ones to highlight where the victory is.
+                        let cellsToFade = [...currentGame]
+                        cellsToFade[combi[0]] = 'fade';
+                        cellsToFade[combi[1]] = 'fade';
+                        cellsToFade[combi[2]] = 'fade';
+                        cellsToFade.forEach((cell, index) => {
+                            if (cell !=='fade'){
+                                document.getElementById('cell'+index).style.opacity = "0.5";
+                            }
+                        });
+                        //
+                    } else if (cellsPlayed.length == 9 && winnerExist == false) {
+                        document.getElementById("text").innerHTML = 'No one has won...';
+                        if (currentPlayer === 'circle') {
+                            currentPlayer = 'cross'
+                        } else { currentPlayer = 'circle' }
+                    }
+                });
+        };
+
+        const restart = () =>{
+            currentGame = [0,0,0,0,0,0,0,0,0];
+
+            for (let i = 0; i<9; i++){
+                let cellClass = 'cell'+i;
+                document.getElementById('cell'+i).style.backgroundImage = "";
+                document.getElementById('cell'+i).style.opacity = "1";
+            }
+            switch(currentPlayer){
+                case 'wincross': currentPlayer = 'circle'; break;
+                case 'wincircle': currentPlayer = 'cross'; break;
+                case 'cross': currentPlayer = 'circle'; break;
+                case 'circle': currentPlayer = 'cross'; break;
+            }
+
+            console.log(currentPlayer+' is now playing.')
+
+            document.getElementById("text").innerHTML = currentPlayer + ' is now playing.';
+        }
+
+        const play = (cellNumber) => {
+            let onlyCellNum = cellNumber.substr(4,1);
+            if (currentPlayer === "circle") {
+                if (currentGame[onlyCellNum] === 0) {
+                    document.getElementById(cellNumber).style.backgroundImage = circleImage;
+                    currentGame[onlyCellNum] = 'circle';
+                    currentPlayer = 'cross';
+                    document.getElementById("text").innerHTML = currentPlayer + ' is now playing.';
+                    checkWinner();
+                }
+
+            } else if(currentPlayer === "cross"){
+                if (currentGame[onlyCellNum] === 0) {
+                    document.getElementById(cellNumber).style.backgroundImage = crossImage;
+                    currentGame[onlyCellNum] = 'cross';
+                    currentPlayer = 'circle';
+                    document.getElementById("text").innerHTML = currentPlayer + ' is now playing.';
+                    checkWinner();
+                }
+            };
+
+        }
+
+        console.log(currentPlayer+' is now playing.')
+    </script>
+</head>
+<body>
+    <div id="text">circle is now playing.</div>
+    <div class="gameBoard">
+        <div id="cell0" onclick=play(this.id)></div>
+        <div id="cell1" onclick=play(this.id)></div>
+        <div id="cell2" onclick=play(this.id)></div>
+        <div id="cell3" onclick=play(this.id)></div>
+        <div id="cell4" onclick=play(this.id)></div>
+        <div id="cell5" onclick=play(this.id)></div>
+        <div id="cell6" onclick=play(this.id)></div>
+        <div id="cell7" onclick=play(this.id)></div>
+        <div id="cell8" onclick=play(this.id)></div>
+    </div>
+    <button onclick=restart()>Restart</button>
+</body>
+</html>
+
+<!--
+            background-image: url(https://cdn-icons-png.flaticon.com/512/481/481078.png);
+            background-image: url(https://cdn-icons-png.flaticon.com/512/1828/1828778.png);
+-->
