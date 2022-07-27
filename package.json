@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "firebase": "^9.9.1"
+  }
+}
+{
+  "hosting": {
+    "site": "tictactoe-cdb",
+    "public": "public",
+  }
+}
